@@ -116,7 +116,7 @@
 
 /* Empty placeholder box if no image */
 .captured-image-section.empty {
-  height: 240px;
+  height: 240px !;
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #fafafa;
