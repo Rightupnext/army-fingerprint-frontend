@@ -91,27 +91,21 @@ export default function AddUserForm() {
     }
   };
 
-  const handleScreenCapture = async () => {
-    try {
-      const response = await axios.post("http://127.0.0.1:5000/capture-screen");
-      const filepath = response.data.filepath;
-      if (filepath) {
-        const filename = extractFilename(filepath);
-        const imageUrl = `http://127.0.0.1:5000/sample/${filename}`;
-        setCapturedImagePath(imageUrl);
-      }
-      if (filepath) {
-        const filename = extractFilename(filepath);
-        setFingerTemplateId(filename); // Save filename here
-        const imageUrl = `http://127.0.0.1:5000/sample/${filename}`;
-        setCapturedImagePath(imageUrl);
-      }
-      console.log(response.data);
-    } catch (error) {
-      console.error("Screen capture error:", error);
-      alert("Failed to trigger screen capture.");
+const handleScreenCapture = async () => {
+  try {
+    const response = await axios.post("http://127.0.0.1:5000/capture-screen");
+    const filename = response.data.filename; // backend sends { filename: "...", message: "Screen captured" }
+    if (filename) {
+      const imageUrl = `http://127.0.0.1:5000/sample/${filename}`;
+      setCapturedImagePath(imageUrl);       // Show preview image
+      setFingerTemplateId(filename);         // Save filename for form submission
     }
-  };
+    console.log(response.data);
+  } catch (error) {
+    console.error("Screen capture error:", error);
+    alert("Failed to trigger screen capture.");
+  }
+};
 
   return (
     <div className="form-container">

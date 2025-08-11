@@ -3,8 +3,6 @@ import axios from "axios";
 import "./Existing.css";
 
 function ExistingUser() {
-  const extractFilename = (path) => path.split("\\").pop();
-
   const [capturedImagePath, setCapturedImagePath] = useState(null);
   const [fingerTemplateId, setFingerTemplateId] = useState("");
   const [matchResult, setMatchResult] = useState(null);
@@ -12,9 +10,8 @@ function ExistingUser() {
   const handleScreenCapture = async () => {
     try {
       const response = await axios.post("http://127.0.0.1:5000/capture-screen");
-      const filepath = response.data.filepath;
-      if (filepath) {
-        const filename = extractFilename(filepath);
+      const filename = response.data.filename; // Use 'filename' from backend
+      if (filename) {
         const imageUrl = `http://127.0.0.1:5000/sample/${filename}`;
         setCapturedImagePath(imageUrl);
         setFingerTemplateId(filename);
@@ -63,7 +60,7 @@ function ExistingUser() {
           Fingerprint Capture
         </button>
 
-        <button type="submit" className="submit-btn" onClick={verifyFinger}>
+        <button type="submit" className="submit-btn" onClick={verifyFinger} disabled={!fingerTemplateId}>
           Submit
         </button>
       </div>
@@ -74,6 +71,7 @@ function ExistingUser() {
           <div className="match-result">
             <h2>Match Result</h2>
             <div className="user-details">
+              <img src={`http://127.0.0.1:5000/uploads/${matchResult.user.photo}`}/>
               <p><strong>First Name:</strong> {matchResult.user.firstName}</p>
               <p><strong>Last Name:</strong> {matchResult.user.lastName}</p>
               <p><strong>Email:</strong> {matchResult.user.email}</p>

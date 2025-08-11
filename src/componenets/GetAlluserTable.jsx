@@ -89,31 +89,39 @@ function GetAlluserTable() {
       )}
 
       {selectedUser && (
-        <div className="modalOverlay" onClick={() => setSelectedUser(null)}>
-          <div className="modalContent" onClick={(e) => e.stopPropagation()}>
-            <h3 className="modalTitle">
-              {selectedUser.firstName} {selectedUser.lastName} - Details
-            </h3>
-            <table className="modalTable">
-              <tbody>
-                {Object.entries(selectedUser).map(([key, val]) => (
-                  <tr key={key}>
-                    <td className="key">{key.replace(/_/g, " ")}</td>
-                    <td>{val === null ? "N/A" : val.toString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <button
-              className="closeButton"
-              onClick={() => setSelectedUser(null)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+  <div className="modalOverlay" onClick={() => setSelectedUser(null)}>
+    <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+      <h3 className="modalTitle">
+        {selectedUser.firstName} {selectedUser.lastName} - Details
+      </h3>
+      {/* Show user photo */}
+      {selectedUser.photo && (
+        <img
+          src={`http://127.0.0.1:5000/uploads/${selectedUser.photo}`}
+          alt={`${selectedUser.firstName} ${selectedUser.lastName}`}
+          style={{ maxWidth: "150px", marginBottom: "15px", borderRadius: "8px" }}
+        />
       )}
+      <table className="modalTable">
+        <tbody>
+          {Object.entries(selectedUser).map(([key, val]) => (
+            // Optionally skip showing the photo field here since it's shown above
+            key === "photo" ? null : (
+              <tr key={key}>
+                <td className="key">{key.replace(/_/g, " ")}</td>
+                <td>{val === null ? "N/A" : val.toString()}</td>
+              </tr>
+            )
+          ))}
+        </tbody>
+      </table>
+
+      <button className="closeButton" onClick={() => setSelectedUser(null)}>
+        Close
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 }
