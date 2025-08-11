@@ -31,6 +31,8 @@ export default function AddUserForm() {
 
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedImagePath, setCapturedImagePath] = useState(null);
+  const [fingerTemplateId, setFingerTemplateId] = useState("");
+
   const webcamRef = useRef(null);
 
   const handleChange = (e) => {
@@ -61,6 +63,11 @@ export default function AddUserForm() {
       formDataObj.append(key, value);
     });
 
+    // Add fingerprint image filename as finger_Template_id
+    if (fingerTemplateId) {
+      formDataObj.append("finger_Template_id", fingerTemplateId);
+    }
+
     if (capturedImage) {
       const blob = dataURLtoBlob(capturedImage);
       formDataObj.append("photo", blob, "photo.jpg");
@@ -90,6 +97,12 @@ export default function AddUserForm() {
       const filepath = response.data.filepath;
       if (filepath) {
         const filename = extractFilename(filepath);
+        const imageUrl = `http://127.0.0.1:5000/sample/${filename}`;
+        setCapturedImagePath(imageUrl);
+      }
+      if (filepath) {
+        const filename = extractFilename(filepath);
+        setFingerTemplateId(filename); // Save filename here
         const imageUrl = `http://127.0.0.1:5000/sample/${filename}`;
         setCapturedImagePath(imageUrl);
       }
@@ -239,7 +252,7 @@ export default function AddUserForm() {
 
             {capturedImagePath ? (
               <div className="captured-image-section">
-                <h3>Captured Screen Image:</h3>
+                <h3>Captured Finger Screen Image:</h3>
                 <img
                   src={capturedImagePath}
                   alt="Captured screen"
@@ -253,7 +266,7 @@ export default function AddUserForm() {
             )}
 
             <button type="button" onClick={handleScreenCapture} className="btn">
-          Finger print Capture
+              Finger print Capture
             </button>
           </div>
         </div>
