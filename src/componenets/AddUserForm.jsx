@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from "react";
 import Webcam from "react-webcam";
 import axios from "axios";
 import "./AddUserForm.css";
-
+import Swal from "sweetalert2";
 const videoConstraints = {
   width: 320,
   height: 240,
@@ -83,29 +83,57 @@ export default function AddUserForm() {
           },
         }
       );
-      console.log("Server response:", response.data);
-      alert("Form submitted successfully!");
+      // SweetAlert success
+      await Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Form submitted successfully!",
+      });
+
+      // Reset all form fields and states
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        mobileNumber: "",
+        rollNo: "",
+        rallyNo: "",
+        centerName: "",
+        aadharNumber: "",
+        identificationMarks: "",
+        qualifications: "",
+        trade: "",
+        address: "",
+      });
+      setCapturedImage(null);
+      setCapturedImagePath(null);
+      setFingerTemplateId("");
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Failed to submit form.");
+      alert("Failed to submit form."); // SweetAlert error
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to submit form.",
+      });
     }
   };
 
-const handleScreenCapture = async () => {
-  try {
-    const response = await axios.post("http://127.0.0.1:5000/capture-screen");
-    const filename = response.data.filename; // backend sends { filename: "...", message: "Screen captured" }
-    if (filename) {
-      const imageUrl = `http://127.0.0.1:5000/sample/${filename}`;
-      setCapturedImagePath(imageUrl);       // Show preview image
-      setFingerTemplateId(filename);         // Save filename for form submission
+  const handleScreenCapture = async () => {
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/capture-screen");
+      const filename = response.data.filename; // backend sends { filename: "...", message: "Screen captured" }
+      if (filename) {
+        const imageUrl = `http://127.0.0.1:5000/sample/${filename}`;
+        setCapturedImagePath(imageUrl); // Show preview image
+        setFingerTemplateId(filename); // Save filename for form submission
+      }
+      console.log(response.data);
+    } catch (error) {
+      console.error("Screen capture error:", error);
+      alert("Failed to trigger screen capture.");
     }
-    console.log(response.data);
-  } catch (error) {
-    console.error("Screen capture error:", error);
-    alert("Failed to trigger screen capture.");
-  }
-};
+  };
 
   return (
     <div className="form-container">
@@ -120,6 +148,7 @@ const handleScreenCapture = async () => {
             placeholder="First Name"
             required
             className="input-field"
+            autoComplete="off"
           />
           <input
             name="lastName"
@@ -127,6 +156,7 @@ const handleScreenCapture = async () => {
             onChange={handleChange}
             placeholder="Last Name"
             className="input-field"
+            autoComplete="off"
           />
         </div>
 
@@ -138,6 +168,7 @@ const handleScreenCapture = async () => {
             onChange={handleChange}
             placeholder="Email"
             className="input-field"
+            autoComplete="off"
           />
           <input
             name="mobileNumber"
@@ -146,6 +177,7 @@ const handleScreenCapture = async () => {
             onChange={handleChange}
             placeholder="Mobile Number"
             className="input-field"
+            autoComplete="off"
           />
         </div>
 
@@ -156,6 +188,7 @@ const handleScreenCapture = async () => {
             onChange={handleChange}
             placeholder="Roll No"
             className="input-field short"
+            autoComplete="off"
           />
           <input
             name="rallyNo"
@@ -163,6 +196,7 @@ const handleScreenCapture = async () => {
             onChange={handleChange}
             placeholder="Rally No"
             className="input-field short"
+            autoComplete="off"
           />
           <input
             name="centerName"
@@ -170,6 +204,7 @@ const handleScreenCapture = async () => {
             onChange={handleChange}
             placeholder="Center Name"
             className="input-field long"
+            autoComplete="off"
           />
         </div>
 
@@ -179,8 +214,9 @@ const handleScreenCapture = async () => {
             value={formData.aadharNumber}
             maxLength={16}
             onChange={handleChange}
-            placeholder="Aadhar Number (16 digits)"
+            placeholder="Aadhar Number (12 digits)"
             className="input-field medium"
+            autoComplete="off"
           />
           <input
             name="identificationMarks"
@@ -188,6 +224,7 @@ const handleScreenCapture = async () => {
             onChange={handleChange}
             placeholder="Identification Marks"
             className="input-field medium"
+            autoComplete="off"
           />
         </div>
 
@@ -198,6 +235,7 @@ const handleScreenCapture = async () => {
             onChange={handleChange}
             placeholder="Qualifications (e.g. 10th, Diploma)"
             className="input-field medium"
+            autoComplete="off"
           />
           <input
             name="trade"
@@ -205,6 +243,7 @@ const handleScreenCapture = async () => {
             onChange={handleChange}
             placeholder="Trade (e.g. Electrician)"
             className="input-field medium"
+            autoComplete="off"
           />
         </div>
 
@@ -215,6 +254,7 @@ const handleScreenCapture = async () => {
           placeholder="Address"
           rows={4}
           className="textarea-field"
+          autoComplete="off"
         />
 
         {/* Webcam and captured images */}
