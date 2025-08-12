@@ -1,8 +1,8 @@
 import React, { useState, useRef, useCallback } from "react";
 import Webcam from "react-webcam";
 import axios from "axios";
-import "./AddUserForm.css";
 import Swal from "sweetalert2";
+
 const videoConstraints = {
   width: 320,
   height: 240,
@@ -63,7 +63,6 @@ export default function AddUserForm() {
       formDataObj.append(key, value);
     });
 
-    // Add fingerprint image filename as finger_Template_id
     if (fingerTemplateId) {
       formDataObj.append("finger_Template_id", fingerTemplateId);
     }
@@ -83,14 +82,12 @@ export default function AddUserForm() {
           },
         }
       );
-      // SweetAlert success
       await Swal.fire({
         icon: "success",
         title: "Success!",
         text: "Form submitted successfully!",
       });
 
-      // Reset all form fields and states
       setFormData({
         firstName: "",
         lastName: "",
@@ -110,7 +107,6 @@ export default function AddUserForm() {
       setFingerTemplateId("");
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Failed to submit form."); // SweetAlert error
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -122,11 +118,11 @@ export default function AddUserForm() {
   const handleScreenCapture = async () => {
     try {
       const response = await axios.post("http://127.0.0.1:5000/capture-screen");
-      const filename = response.data.filename; // backend sends { filename: "...", message: "Screen captured" }
+      const filename = response.data.filename;
       if (filename) {
         const imageUrl = `http://127.0.0.1:5000/sample/${filename}`;
-        setCapturedImagePath(imageUrl); // Show preview image
-        setFingerTemplateId(filename); // Save filename for form submission
+        setCapturedImagePath(imageUrl);
+        setFingerTemplateId(filename);
       }
       console.log(response.data);
     } catch (error) {
@@ -136,39 +132,42 @@ export default function AddUserForm() {
   };
 
   return (
-    <div className="form-container">
-      <h2 className="form-title">ADD USER FORM</h2>
-      <form onSubmit={handleSubmit} className="form-layout">
-        {/* Rows of inputs */}
-        <div className="row">
+    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-3xl font-extrabold text-amber-700 mb-8 text-center">
+        ADD USER FORM
+      </h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* First & Last Name */}
+        <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
           <input
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
             placeholder="First Name"
             required
-            className="input-field"
             autoComplete="off"
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <input
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
             placeholder="Last Name"
-            className="input-field"
             autoComplete="off"
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
 
-        <div className="row">
+        {/* Email & Mobile Number */}
+        <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
           <input
             name="email"
             type="email"
             value={formData.email}
             onChange={handleChange}
             placeholder="Email"
-            className="input-field"
             autoComplete="off"
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <input
             name="mobileNumber"
@@ -176,136 +175,158 @@ export default function AddUserForm() {
             value={formData.mobileNumber}
             onChange={handleChange}
             placeholder="Mobile Number"
-            className="input-field"
             autoComplete="off"
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
 
-        <div className="row">
+        {/* RollNo, RallyNo, CenterName */}
+        <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
           <input
             name="rollNo"
             value={formData.rollNo}
             onChange={handleChange}
             placeholder="Roll No"
-            className="input-field short"
             autoComplete="off"
+            className="w-1/4 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <input
             name="rallyNo"
             value={formData.rallyNo}
             onChange={handleChange}
             placeholder="Rally No"
-            className="input-field short"
             autoComplete="off"
+            className="w-1/4 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <input
             name="centerName"
             value={formData.centerName}
             onChange={handleChange}
             placeholder="Center Name"
-            className="input-field long"
             autoComplete="off"
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
 
-        <div className="row">
+        {/* Aadhar Number & Identification Marks */}
+        <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
           <input
             name="aadharNumber"
             value={formData.aadharNumber}
             maxLength={16}
             onChange={handleChange}
             placeholder="Aadhar Number (12 digits)"
-            className="input-field medium"
             autoComplete="off"
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <input
             name="identificationMarks"
             value={formData.identificationMarks}
             onChange={handleChange}
             placeholder="Identification Marks"
-            className="input-field medium"
             autoComplete="off"
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
 
-        <div className="row">
+        {/* Qualifications & Trade */}
+        <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
           <input
             name="qualifications"
             value={formData.qualifications}
             onChange={handleChange}
             placeholder="Qualifications (e.g. 10th, Diploma)"
-            className="input-field medium"
             autoComplete="off"
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <input
             name="trade"
             value={formData.trade}
             onChange={handleChange}
             placeholder="Trade (e.g. Electrician)"
-            className="input-field medium"
             autoComplete="off"
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
 
+        {/* Address */}
         <textarea
           name="address"
           value={formData.address}
           onChange={handleChange}
           placeholder="Address"
           rows={4}
-          className="textarea-field"
           autoComplete="off"
+          className="w-full resize-none rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
         />
 
-        {/* Webcam and captured images */}
-        <div className="capture-section">
-          <div className="left-panel">
+        {/* Capture section */}
+        <div className="flex flex-col md:flex-row  space-y-6 md:space-y-0 ">
+          {/* Webcam & capture button */}
+          <div className="flex flex-col items-center space-y-4">
             <Webcam
               audio={false}
               ref={webcamRef}
               screenshotFormat="image/jpeg"
               videoConstraints={videoConstraints}
-              className="webcam"
+              className="w-full h-60 rounded-md border border-gray-300 object-cover"
             />
-            <button type="button" onClick={capture} className="btn">
+            <button
+              type="button"
+              onClick={capture}
+              className="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-amber-700 transition"
+            >
               Capture Photo
             </button>
           </div>
 
-          <div className="right-panel">
-            {capturedImage && (
-              <div className="captured-image-section">
-                <h3>Captured Photo:</h3>
+          {/* Captured images and screen capture button */}
+          <div className="flex flex-col items-center space-y-4 w-full ">
+            {capturedImage ? (
+              <div className="text-center">
+                <h3 className="mb-2 font-semibold text-gray-700">
+                  Captured Photo:
+                </h3>
                 <img
                   src={capturedImage}
                   alt="Captured"
-                  className="captured-image"
+                  className="w-64 h-48 rounded-md border border-gray-300 object-contain"
                 />
               </div>
-            )}
+            ) : null}
 
             {capturedImagePath ? (
-              <div className="captured-image-section">
-                <h3>Captured Finger Screen Image:</h3>
+              <div className="text-center">
+                <h3 className="mb-2 font-semibold text-gray-700">
+                  Captured Finger Screen Image:
+                </h3>
                 <img
                   src={capturedImagePath}
                   alt="Captured screen"
-                  className="captured-image"
+                  className="w-64 h-48 rounded-md border border-gray-300 object-contain"
                 />
               </div>
             ) : (
-              <div className="captured-image-section empty">
-                Plaese Captured Finger Screen
+              <div className="w-xl h-full flex items-center justify-center rounded-md border-2 border-dashed border-amber-600 text-amber-600 font-semibold">
+                Please Capture Finger Screen
               </div>
             )}
 
-            <button type="button" onClick={handleScreenCapture} className="btn">
-              Finger print Capture
+            <button
+              type="button"
+              onClick={handleScreenCapture}
+              className="mt-4 px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-amber-700 transition"
+            >
+              Fingerprint Capture
             </button>
           </div>
         </div>
 
-        <button type="submit" className="submit-btn">
+        {/* Submit button */}
+        <button
+          type="submit"
+          className="w-full py-3 bg-amber-600 text-white rounded-md text-lg font-semibold hover:bg-amber-700 transition"
+        >
           Submit
         </button>
       </form>
