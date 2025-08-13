@@ -134,7 +134,7 @@ export default function AddUserForm() {
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-3xl font-extrabold text-amber-700 mb-8 text-center">
-        ADD USER FORM
+        User Requirement Management
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* First & Last Name */}
