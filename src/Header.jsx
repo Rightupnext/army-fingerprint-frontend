@@ -4,6 +4,7 @@ import img2 from './assets/img1.png';
 import AddUserForm from "./componenets/AddUserForm";
 import ExistingUser from "./componenets/ExistingUser";
 import GetAlluserTable from "./componenets/GetAlluserTable";
+import BiometricGetUser from "./componenets/BiometricGetUser";
 
 export default function Header({ setActiveTab, activeTab }) {
   return (
@@ -51,7 +52,7 @@ export default function Header({ setActiveTab, activeTab }) {
       {/* Tab content below header */}
       <div className="w-full mt-4 px-4">
         {activeTab === "tab1" && <AddUserForm />}
-        {activeTab === "tab2" && <ExistingUser />}
+        {activeTab === "tab2" && <BiometricGetUser />}
         {activeTab === "tab3" && <GetAlluserTable />}
       </div>
     </>

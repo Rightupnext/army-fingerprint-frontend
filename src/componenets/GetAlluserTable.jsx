@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 function GetAlluserTable() {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
@@ -43,6 +44,50 @@ function GetAlluserTable() {
   useEffect(() => {
     setCurrentPage(1);
   }, [displayCount]);
+const exportToExcel = () => {
+  if (!users || users.length === 0) return;
+
+  // Map users and format dates
+  const formattedData = users.map(u => ({
+    AadharNumber: u.aadharNumber || "",
+    Address: u.address || "",
+    CenterName: u.centerName || "",
+    CreatedAt: formatDate(u.created_at),
+    UpdatedAt: formatDate(u.updated_at),
+    Email: u.email || "",
+    FingerTemplateId: u.finger_Template_idfinger_Template_id || "",
+    FirstName: u.firstName || "",
+    LastName: u.lastName || "",
+    MobileNumber: u.mobileNumber || "",
+    Photo: u.photo || "",
+    Qualifications: u.qualifications || "",
+    RallyNo: u.rallyNo || "",
+    RollNo: u.rollNo || "",
+    Trade: u.trade || "",
+    IdentificationMarks: u.identificationMarks || "",
+    Id: u.id || ""
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(formattedData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+  saveAs(data, "users.xlsx");
+};
+
+// Helper function to format ISO string to DD/MM/YYYY HH:mm
+const formatDate = (isoString) => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
 
   // Helper to create page buttons dynamically
   const renderPageButtons = () => {
@@ -66,27 +111,78 @@ function GetAlluserTable() {
 
     return buttons;
   };
+const handleDelete = async (userId) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this user? This action cannot be undone."
+  );
+  if (!confirmDelete) return;
+
+  try {
+    const response = await axios.delete(`http://127.0.0.1:5000/user/${userId}`);
+    if (response.status === 200) {
+      // Remove user from main users state
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted",
+        text: "User deleted successfully",
+      });
+    }
+  } catch (error) {
+    console.error("Delete error:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Failed to delete user",
+    });
+  }
+};
+
+
   return (
     <div className="mx-[30px]">
       <h2 className="title">Search Here</h2>
-      <div className="flex px-4 py-3 rounded-md border-2 border-blue-500 overflow-hidden max-w-md ">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 192.904 192.904"
-          width="16px"
-          className="fill-gray-600 mr-3 rotate-90"
-        >
-          <path d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z"></path>
-        </svg>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          type="email"
-          placeholder="Search Something..."
-          className="w-full outline-none bg-transparent text-gray-600 text-sm"
-        />
+      <div className="flex justify-between">
+        <div className="flex px-4 h-[50px] rounded-md border-2 border-blue-500 overflow-hidden max-w-md ">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 192.904 192.904"
+            width="16px"
+            className="fill-gray-600 mr-3 rotate-90"
+          >
+            <path d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z"></path>
+          </svg>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            type="email"
+            placeholder="Search Something..."
+            className="w-[300px] outline-none bg-transparent text-gray-600 text-sm"
+          />
+        </div>
+        <div className="flex flex-wrap gap-4 mt-8">
+          <button
+          onClick={exportToExcel}
+            type="button"
+            className="px-5 py-2.5 flex items-center justify-center rounded-sm cursor-pointer text-white text-sm tracking-wider font-medium border-none outline-none bg-blue-600 hover:bg-blue-700 active:bg-blue-600"
+          >
+            Download
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16px"
+              fill="currentColor"
+              className="ml-2 inline"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 16a.749.749 0 0 1-.542-.232l-5.25-5.5A.75.75 0 0 1 6.75 9H9.5V3.25c0-.689.561-1.25 1.25-1.25h2.5c.689 0 1.25.561 1.25 1.25V9h2.75a.75.75 0 0 1 .542 1.268l-5.25 5.5A.749.749 0 0 1 12 16zm10.25 6H1.75C.785 22 0 21.215 0 20.25v-.5C0 18.785.785 18 1.75 18h20.5c.965 0 1.75.785 1.75 1.75v.5c0 .965-.785 1.75-1.75 1.75z"
+                data-original="#000000"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
-
       {loading && <p>Loading users...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -216,6 +312,7 @@ function GetAlluserTable() {
                       </button>
                       <button
                         type="button"
+                        onClick={() => handleDelete(user.id)}
                         className="flex items-center gap-2 rounded-lg text-red-600 bg-red-50 border border-gray-200 px-3 py-1 cursor-pointer"
                       >
                         Delete
